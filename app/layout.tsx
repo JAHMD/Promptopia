@@ -1,8 +1,7 @@
+import Navbar from "@/components/Navbar";
+import Provider from "@/components/Provider";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: "Promptopia",
@@ -11,15 +10,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
+	session,
 }: {
 	children: React.ReactNode;
+	session: any;
 }) {
 	return (
 		<html lang="en">
-			<div className="main" aria-hidden="true">
-				<div className="gradient" aria-hidden="true"></div>
-			</div>
-			<body className={inter.className}>{children}</body>
+			<head>
+				<link rel="icon" href="/assets/images/logo.svg" sizes="any" />
+			</head>
+			<body className="">
+				<Provider session={session}>
+					<div className="main" aria-hidden="true">
+						<div className="gradient" aria-hidden="true"></div>
+					</div>
+					<Navbar />
+					<main className="app">{children}</main>
+				</Provider>
+				;
+			</body>
 		</html>
 	);
 }
