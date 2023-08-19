@@ -3,7 +3,7 @@
 import { PostType } from "@/components/Feed";
 import Profile from "@/components/Profile";
 import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UserType } from "../create-prompt/page";
 
