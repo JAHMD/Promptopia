@@ -1,41 +1,18 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { Post } from "@/app/create-prompt/page";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 
-type Post = { prompt: string; tag: string };
+type Props = {
+	type: string;
+	post: Post;
+	setPost: Dispatch<SetStateAction<Post>>;
+	submitting: boolean;
+	handleSubmit: (e: FormEvent) => Promise<void>;
+};
 
-const Form = ({ type }: { type: string }) => {
-	const { data: session } = useSession();
-	const router = useRouter();
-
-	const [submitting, setSubmitting] = useState<boolean>(false);
-	const [post, setPost] = useState<Post>({ prompt: "", tag: "" });
-
-	const createPost = async (e: FormEvent) => {
-		e.preventDefault();
-		setSubmitting(true);
-		const tag = post.tag[0] === "#" ? post.tag : `#${post.tag}`;
-		const newPost = { ...post, userId: session?.user?.id, tag };
-
-		try {
-			const response = await fetch("/api/prompt/new", {
-				method: "POST",
-				body: JSON.stringify(newPost),
-			});
-
-			if (response.ok) {
-				router.push("/");
-			}
-		} catch (error: any) {
-			throw new Error(error.message);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
+const Form = ({ type, post, setPost, submitting, handleSubmit }: Props) => {
 	return (
 		<>
 			<h1 className="head_text text-left">
@@ -46,7 +23,7 @@ const Form = ({ type }: { type: string }) => {
 				imagination run wild with any AI-powered platform
 			</p>
 			<form
-				onSubmit={createPost}
+				onSubmit={handleSubmit}
 				className="mt-10 w-full max-w-2xl flex flex-col gap-7 glassmorphism"
 			>
 				<label>

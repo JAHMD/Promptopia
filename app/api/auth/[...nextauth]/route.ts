@@ -1,5 +1,6 @@
 import User from "@/models/user";
 import { connectToDB } from "@/utils/db";
+import { Session } from "inspector";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -32,7 +33,7 @@ const handler = NextAuth({
 		},
 		async session({ session }: any) {
 			const userSession = await User.findOne({ email: session.user.email });
-			session.user.id = userSession._id.toString();
+			session.user.id = userSession._id.toString() as string;
 
 			return session;
 		},

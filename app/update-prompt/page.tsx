@@ -2,8 +2,8 @@
 
 import Form from "@/components/Form";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 
 export type UserType = {
 	id: string;
@@ -14,7 +14,10 @@ export type UserType = {
 
 export type Post = { prompt: string; tag: string };
 
-const CreatePromptPage = () => {
+const EditPromptPage = () => {
+	const searchParams = useSearchParams();
+	const postId = searchParams.get("id");
+
 	const { data: session } = useSession();
 	const router = useRouter();
 	const user = session?.user as UserType;
@@ -22,14 +25,14 @@ const CreatePromptPage = () => {
 	const [submitting, setSubmitting] = useState<boolean>(false);
 	const [post, setPost] = useState<Post>({ prompt: "", tag: "" });
 
-	const createPrompt = async (e: FormEvent) => {
+	const editPrompt = async (e: FormEvent) => {
 		e.preventDefault();
 		setSubmitting(true);
 		const newPost = { ...post, userId: user.id };
 
 		try {
-			const response = await fetch("/api/prompt/new", {
-				method: "POST",
+			const response = await fetch(`/api/prompt/${postId}`, {
+				method: "PATCH",
 				body: JSON.stringify(newPost),
 			});
 
@@ -43,17 +46,29 @@ const CreatePromptPage = () => {
 		}
 	};
 
+	const getPrompt = async (id: string) => {
+		const prompt = await fetch(`/api/prompt/${id}`).then((response) =>
+			response.json()
+		);
+		console.log(prompt);
+		setPost(prompt);
+	};
+
+	useEffect(() => {
+		getPrompt(postId!);
+	}, [postId]);
+
 	return (
 		<section className="w-full max-w-full pt-6 pb-10 flex-start items-center flex-col">
 			<Form
-				type="Create"
+				type="Edit"
 				post={post}
 				setPost={setPost}
 				submitting={submitting}
-				handleSubmit={createPrompt}
+				handleSubmit={editPrompt}
 			/>
 		</section>
 	);
 };
 
-export default CreatePromptPage;
+export default EditPromptPage;

@@ -1,5 +1,66 @@
-const ProfilePage = () => {
-	return <section>ProfilePage</section>;
+"use client";
+
+import { PostType } from "@/components/Feed";
+import Profile from "@/components/Profile";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { UserType } from "../create-prompt/page";
+
+const MyProfile = () => {
+	const router = useRouter();
+	const { data: session } = useSession();
+	const user = session?.user as UserType;
+
+	const [myPosts, setMyPosts] = useState<PostType[]>([]);
+
+	const fetchPosts = async () => {
+		const response = await fetch(`/api/users/${user?.id}/posts`);
+		const data = await response.json();
+		setMyPosts(data);
+	};
+
+	useEffect(() => {
+		if (user?.id) fetchPosts();
+	}, []);
+
+	if (!user) {
+		return router.replace("/");
+	}
+
+	const handleEdit = (id: string) => {
+		router.push(`/update-prompt?id=${id}`);
+	};
+
+	const handleDelete = async (id: string) => {
+		const hasConfirmed = confirm(
+			"Are you sure you want to delete this prompt?"
+		);
+
+		if (hasConfirmed) {
+			try {
+				await fetch(`/api/prompt/${id.toString()}`, {
+					method: "DELETE",
+				});
+
+				const filteredPosts = myPosts.filter((item) => item._id !== id);
+
+				setMyPosts(filteredPosts);
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	};
+
+	return (
+		<Profile
+			name="My"
+			desc="Welcome to your personalized profile page. Share your exceptional prompts and inspire others with the power of your imagination"
+			data={myPosts}
+			handleEdit={handleEdit}
+			handleDelete={handleDelete}
+		/>
+	);
 };
 
-export default ProfilePage;
+export default MyProfile;
