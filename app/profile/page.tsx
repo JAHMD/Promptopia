@@ -24,10 +24,6 @@ const MyProfile = () => {
 		if (user?.id) fetchPosts();
 	}, []);
 
-	if (!user) {
-		return router.replace("/");
-	}
-
 	const handleEdit = (id: string) => {
 		router.push(`/update-prompt?id=${id}`);
 	};
