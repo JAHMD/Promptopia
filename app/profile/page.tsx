@@ -10,19 +10,18 @@ import { UserType } from "../create-prompt/page";
 const MyProfile = () => {
 	const router = useRouter();
 	const { data: session } = useSession();
+	const user = session?.user as UserType;
 
 	const [myPosts, setMyPosts] = useState<PostType[]>([]);
 
 	const fetchPosts = async () => {
-		const response = await fetch(`/api/users/${session?.user?.id}/posts`);
+		const response = await fetch(`/api/users/${user?.id}/posts`);
 		const data = await response.json();
 		setMyPosts(data);
 	};
 
 	useEffect(() => {
-		if (session?.user?.id) {
-			fetchPosts();
-		}
+		if (user?.id) fetchPosts();
 	}, []);
 
 	const handleEdit = (id: string) => {
